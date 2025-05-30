@@ -1,0 +1,76 @@
+--[[ Martin AWS Script Feature: Fast Train Fast Fight Fast Hatch Auto Rebirth Anti Afk UI: Gradient red → orange → yellow, Font: Sans, Logo: MSC ]]
+
+-- UI LIBRARY local Library = {} Library.__index = Library
+
+function Library.new(title) local screenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui")) screenGui.Name = "MartinAWS_UI" screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 450, 0, 330)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -165)
+mainFrame.BackgroundColor3 = Color3.fromRGB(255, 80, 0)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local gradient = Instance.new("UIGradient", mainFrame)
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(220, 30, 30)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 140, 0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 0))
+})
+
+local titleLabel = Instance.new("TextLabel", mainFrame)
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = title
+titleLabel.Font = Enum.Font.SourceSans
+titleLabel.TextSize = 32
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local layout = Instance.new("UIListLayout", mainFrame)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 6)
+
+return setmetatable({Gui = screenGui, Frame = mainFrame}, Library)
+
+end
+
+function Library:addToggle(name, callback) local toggle = Instance.new("TextButton", self.Frame) toggle.Size = UDim2.new(1, -20, 0, 40) toggle.Position = UDim2.new(0, 10, 0, 0) toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40) toggle.TextColor3 = Color3.fromRGB(255, 255, 255) toggle.Font = Enum.Font.SourceSans toggle.TextSize = 22 toggle.Text = "[ OFF ] " .. name
+
+local state = false
+toggle.MouseButton1Click:Connect(function()
+    state = not state
+    toggle.Text = (state and "[ ON ] " or "[ OFF ] ") .. name
+    callback(state)
+end)
+
+end
+
+function Library:addDropdown(name, list, callback) local dropdown = Instance.new("TextButton", self.Frame) dropdown.Size = UDim2.new(1, -20, 0, 40) dropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50) dropdown.TextColor3 = Color3.fromRGB(255, 255, 255) dropdown.Font = Enum.Font.SourceSans dropdown.TextSize = 22 dropdown.Text = name .. ": (click to change)"
+
+local currentIndex = 1
+dropdown.MouseButton1Click:Connect(function()
+    currentIndex = currentIndex % #list + 1
+    local selected = list[currentIndex]
+    dropdown.Text = name .. ": " .. selected
+    callback(selected)
+end)
+
+end
+
+-- Create UI local ui = Library.new("Martin AWS Script")
+
+-- Floating Logo MSC local logo = Instance.new("BillboardGui", game.Players.LocalPlayer:WaitForChild("PlayerGui")) logo.Size = UDim2.new(0, 200, 0, 50) logo.StudsOffset = Vector3.new(0, 3, 0) logo.AlwaysOnTop = true
+
+local frame = Instance.new("Frame", logo) frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) frame.Size = UDim2.new(1, 0, 1, 0)
+
+local text = Instance.new("TextLabel", frame) text.Text = "MSC" text.Font = Enum.Font.SourceSans text.TextSize = 36 text.TextColor3 = Color3.fromRGB(139, 0, 0) text.Size = UDim2.new(1, 0, 1, 0) text.BackgroundTransparency = 1
+
+-- Feature State getgenv().autoTrain = false getgenv().autoFight = false getgenv().autoHatch = false getgenv().autoRebirth = false local selectedEgg = "BasicEgg"
+
+-- Toggles ui:addToggle("Fast Train", function(v) getgenv().autoTrain = v end) ui:addToggle("Fast Fight", function(v) getgenv().autoFight = v end) ui:addToggle("Fast Hatch", function(v) getgenv().autoHatch = v end) ui:addToggle("Auto Rebirth", function(v) getgenv().autoRebirth = v end) ui:addDropdown("Select Egg", {"BasicEgg", "LavaEgg", "CyberEgg", "TechEgg", "ToxicEgg"}, function(v) selectedEgg = v end)
+
+-- Anti-AFK local vu = game:service("VirtualUser") game:service("Players").LocalPlayer.Idled:connect(function() vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame) wait(1) vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame) end)
+
+-- Train Loop spawn(function() while true do if getgenv().autoTrain then for _, v in pairs(workspace:WaitForChild("TrainStations"):GetDescendants()) do if v
+
